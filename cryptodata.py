@@ -1,9 +1,7 @@
 import requests
 import configparser
-import ctypes
-import msl.loadlib
-from msl.loadlib import LoadLibrary
-import os
+import subprocess
+
 #request es una libreria para hacer solicitudes http en python
 
 # leer la clave de API desde el archivo de configuración
@@ -19,32 +17,28 @@ url = "https://rest.coinapi.io/v1/exchangerate/{crypto}/USD"
 #el header es para enviar la solicitud HTTP a la API de CoinAPI.
 headers = {"X-CoinAPI-Key": api_key}
 prices = {}
+
 for crypto in cryptos:
     response = requests.get(url.format(crypto=crypto), headers=headers)
     #la respuesta de coinAPI se hace en json
     #el valor del precio en dolares se encuentra en el campo rate del json
-    prices[crypto] = float(response.json()["rate"])
+    data = response.json()
+    prices[crypto] = float(data["rate"])
 
-    #print(response.json())
-    
 # mostrar los precios obtenidos
 for crypto, price in prices.items():
     print(f"El precio de {crypto} en dolares es: {price}")
 
 
-lib_path = os.path.abspath('libconvert.so')
-libconvert = LoadLibrary(lib_path)
-calculadora = libconvert.lib.asm_calculadora
 
+result = subprocess.run(["./calc", str(210), str(prices['BTC'])], stdout=subprocess.PIPE)
+print(f"El precio de BTC en ARS es: {result.stdout}")
 
-btc_pesos = calculadora(213,int(prices['BTC']))
-eth_pesos = calculadora(213,int(prices['ETH']))
+result = subprocess.run(["./calc", str(210), str(prices['ETH'])], stdout=subprocess.PIPE)
+print(f"El precio de BTC en EUROS es: {result.stdout}")
 
-btc_euros = calculadora(1.1,int(prices['BTC']))
-eth_euros = calculadora(1.1,int(prices['BTC']))
+result = subprocess.run(["./calc", str(1.1), str(prices['BTC'])], stdout=subprocess.PIPE)
+print(f"El precio de BTC en ARS es: {result.stdout}")
 
-
-print(f"El precio de BTC en ARS es: {btc_pesos}")
-print(f"El precio de ETH en ARS es: {eth_pesos}")
-print(f"El precio de BTC en EUR es: {btc_euros}")
-print(f"El precio de ETH en EUR es: {eth_euros}")
+result = subprocess.run(["./calc", str(1.1), str(prices['ETH'])], stdout=subprocess.PIPE)
+print(f"El precio de ETH en EUROS es: {result.stdout}")

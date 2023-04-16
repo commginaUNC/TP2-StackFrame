@@ -6,9 +6,10 @@ segment .text
 asm_calculadora:
     push ebp
     mov ebp, esp
-    mov eax, [ebp + 8] 
-    mov edx, [ebp + 12]
-    imul eax, edx
+    fld qword [ebp + 8] 
+    fld qword [ebp + 12]
+    fmul st1,st0
+    fstp qword [ebp + 8] 
     pop ebp
     ret
 

@@ -1,13 +1,18 @@
+
+#include <stdio.h>
+#include <stdlib.h>
 #include "cdecl.h"
 
-int PRE_CDECL asm_calculadora(int,int) POST_CDECL;
+extern double asm_calculadora(double,double);
 
-int main(){
+int main(int argc, char const *argv[]){
 
-    int tasa_cambio, cotizacion;
-    int conversion;
+    double tasa_cambio = atof(argv[1]);
+    double cotizacion = atof(argv[2]);
+    double conversion;
+
 
     conversion = asm_calculadora(tasa_cambio,cotizacion);
-    //printf("La conversion es: %d\n", conversion);
+    printf("%f", conversion);
     return 0;
 }
