@@ -2,6 +2,8 @@ import requests
 import configparser
 import ctypes
 import msl.loadlib
+from msl.loadlib import LoadLibrary
+import os
 #request es una libreria para hacer solicitudes http en python
 
 # leer la clave de API desde el archivo de configuración
@@ -30,12 +32,19 @@ for crypto, price in prices.items():
     print(f"El precio de {crypto} en dolares es: {price}")
 
 
-libconvert = msl.loadlib.load_library('/libconvert.so')
-
-calculadora = libconvert.asm_calculadora
-
-calculadora.argtypes = [ctypes.c_int, ctypes.c_int]
-calculadora.restype = ctypes.c_int
+lib_path = os.path.abspath('libconvert.so')
+libconvert = LoadLibrary(lib_path)
+calculadora = libconvert.lib.asm_calculadora
 
 
-print(calculadora(213,int(prices['BTC'])))
+btc_pesos = calculadora(213,int(prices['BTC']))
+eth_pesos = calculadora(213,int(prices['ETH']))
+
+btc_euros = calculadora(1.1,int(prices['BTC']))
+eth_euros = calculadora(1.1,int(prices['BTC']))
+
+
+print(f"El precio de BTC en ARS es: {btc_pesos}")
+print(f"El precio de ETH en ARS es: {eth_pesos}")
+print(f"El precio de BTC en EUR es: {btc_euros}")
+print(f"El precio de ETH en EUR es: {eth_euros}")
