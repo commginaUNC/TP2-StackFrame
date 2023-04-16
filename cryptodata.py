@@ -13,17 +13,16 @@ api_key = config['coinapi']['api_key']
 cryptos = ["BTC", "ETH"]
 
 # solicitud a la API de CoinAPI para obtener los precios
-url = "https://rest.coinapi.io/v1/exchangerate/{crypto}/USD"
+url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
 #el header es para enviar la solicitud HTTP a la API de CoinAPI.
-headers = {"X-CoinAPI-Key": api_key}
+headers = {"X-CMC_PRO_API_KEY": api_key}
+params = {"symbol": ",".join(cryptos)}
+response = requests.get(url, headers=headers, params=params)
+data = response.json()
 prices = {}
 
-for crypto in cryptos:
-    response = requests.get(url.format(crypto=crypto), headers=headers)
-    #la respuesta de coinAPI se hace en json
-    #el valor del precio en dolares se encuentra en el campo rate del json
-    data = response.json()
-    prices[crypto] = float(data["rate"])
+for crypto, info in data["data"].items():
+    prices[crypto] = float(info["quote"]["USD"]["price"])
 
 # mostrar los precios obtenidos
 for crypto, price in prices.items():
@@ -31,14 +30,15 @@ for crypto, price in prices.items():
 
 
 
+
 result = subprocess.run(["./calc", str(210), str(prices['BTC'])], stdout=subprocess.PIPE)
 print(f"El precio de BTC en ARS es: {result.stdout}")
 
 result = subprocess.run(["./calc", str(210), str(prices['ETH'])], stdout=subprocess.PIPE)
-print(f"El precio de BTC en EUROS es: {result.stdout}")
+print(f"El precio de BTC en ARS es: {result.stdout}")
 
 result = subprocess.run(["./calc", str(1.1), str(prices['BTC'])], stdout=subprocess.PIPE)
-print(f"El precio de BTC en ARS es: {result.stdout}")
+print(f"El precio de BTC en EUROS es: {result.stdout}")
 
 result = subprocess.run(["./calc", str(1.1), str(prices['ETH'])], stdout=subprocess.PIPE)
 print(f"El precio de ETH en EUROS es: {result.stdout}")
